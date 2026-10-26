@@ -1,2 +1,0 @@
-net.minecraft.world.level.block.LiquidBlock
-net.minecraft.world.level.material.FluidState
