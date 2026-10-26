@@ -7,6 +7,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.entity.SlotAccess;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -219,8 +220,10 @@ public class LocatorCompassItem extends Item {
 		}
 
 		ItemStack stack = stored.create();
-		tooltip.accept(Component.translatable("tooltip.locator_compass.contents", stack.getHoverName(), stack.getCount())
-				.withStyle(ChatFormatting.GRAY));
+		Component contents = stack.getCount() > 1
+				? Component.translatable("tooltip.locator_compass.contents_count", stack.getHoverName(), stack.getCount())
+				: Component.translatable("tooltip.locator_compass.contents", stack.getHoverName());
+		tooltip.accept(contents.copy().withStyle(ChatFormatting.GRAY));
 
 		if (LocatorTargets.resolve(stored.item()).isEmpty()) {
 			tooltip.accept(Component.translatable("tooltip.locator_compass.nothing_to_find").withStyle(ChatFormatting.DARK_GRAY));
@@ -229,7 +232,7 @@ public class LocatorCompassItem extends Item {
 
 	private static void returnToPlayer(Player player, ItemStack stack) {
 		if (!stack.isEmpty()) {
-			player.getInventory().placeItemBackInInventory(stack);
+			player.getInventory().placeItemBackInInventory(stack, Prediction.SERVER_ONLY);
 		}
 	}
 

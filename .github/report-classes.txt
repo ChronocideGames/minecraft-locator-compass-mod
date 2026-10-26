@@ -1,1 +1,1 @@
-net.minecraft.world.entity.player.Inventory
+net.minecraft.util.Prediction

@@ -2,6 +2,7 @@
 	"item.locator_compass.locator_compass": "Locator Compass",
 	"tooltip.locator_compass.empty": "Empty",
 	"tooltip.locator_compass.how_to": "Right-click an item onto it to choose what to find",
-	"tooltip.locator_compass.contents": "Finding: %s ×%s",
+	"tooltip.locator_compass.contents": "Finding: %s",
+	"tooltip.locator_compass.contents_count": "Finding: %s ×%s",
 	"tooltip.locator_compass.nothing_to_find": "This item has no block to find"
 }
