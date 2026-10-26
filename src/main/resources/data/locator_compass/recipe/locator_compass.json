@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    "minecraft:compass",
+    "minecraft:leather",
+    "minecraft:string"
+  ],
+  "result": {
+    "id": "locator_compass:locator_compass"
+  }
+}

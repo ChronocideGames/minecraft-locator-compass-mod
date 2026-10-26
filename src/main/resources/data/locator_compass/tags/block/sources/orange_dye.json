@@ -1,0 +1,13 @@
+{
+  "values": [
+    "minecraft:orange_tulip",
+    {
+      "id": "minecraft:torchflower",
+      "required": false
+    },
+    {
+      "id": "minecraft:open_eyeblossom",
+      "required": false
+    }
+  ]
+}

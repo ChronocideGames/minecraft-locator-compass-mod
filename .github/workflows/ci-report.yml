@@ -42,12 +42,10 @@ jobs:
             for J in $(grep -iE 'minecraft' "$R/jars.txt"); do
               unzip -Z1 "$J" 2>/dev/null | grep -E '^(assets|data)/minecraft/' >> "$R/all-resources-raw.txt"
               for f in assets/minecraft/items/compass.json assets/minecraft/items/recovery_compass.json \
-                       assets/minecraft/items/bundle.json assets/minecraft/models/item/compass_16.json \
-                       assets/minecraft/models/item/compass.json data/minecraft/recipe/compass.json \
-                       data/minecraft/recipe/bundle.json data/minecraft/advancement/recipes/tools/compass.json \
-                       data/minecraft/tags/block/iron_ores.json data/minecraft/tags/block/leaves.json \
-                       data/minecraft/tags/block/logs.json data/minecraft/tags/block/copper_ores.json; do
-                unzip -p "$J" "$f" > "$R/assets/$(echo "$f" | tr '/' '_')" 2>/dev/null || rm -f "$R/assets/$(echo "$f" | tr '/' '_')"
+                       assets/minecraft/models/item/compass_16.json data/minecraft/recipe/fire_charge.json; do
+                if unzip -Z1 "$J" "$f" >/dev/null 2>&1; then
+                  unzip -p "$J" "$f" > "$R/assets/$(echo "$f" | tr '/' '_')"
+                fi
               done
             done
             sort -u "$R/all-resources-raw.txt" > "$R/all-resources.txt"; rm -f "$R/all-resources-raw.txt"

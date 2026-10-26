@@ -3,9 +3,21 @@
 	"id": "locator_compass",
 	"version": "${version}",
 	"name": "Locator Compass",
+	"description": "A compass with a one-slot bag. Put an item in it and the needle points to the nearest matching block within the surrounding 3x3 chunks.",
+	"authors": [
+		"ChronocideGames"
+	],
+	"contact": {
+		"sources": "https://github.com/ChronocideGames/minecraft-locator-compass-mod"
+	},
 	"environment": "*",
 	"entrypoints": {
-		"main": ["com.chronocidegames.locatorcompass.LocatorCompass"]
+		"main": [
+			"com.chronocidegames.locatorcompass.LocatorCompass"
+		],
+		"client": [
+			"com.chronocidegames.locatorcompass.client.LocatorCompassClient"
+		]
 	},
 	"depends": {
 		"fabricloader": ">=0.20.1",

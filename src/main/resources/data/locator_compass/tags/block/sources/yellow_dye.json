@@ -1,0 +1,10 @@
+{
+  "values": [
+    "minecraft:dandelion",
+    "minecraft:sunflower",
+    {
+      "id": "minecraft:wildflowers",
+      "required": false
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "values": [
+    "minecraft:pink_tulip",
+    "minecraft:peony",
+    {
+      "id": "minecraft:pink_petals",
+      "required": false
+    },
+    {
+      "id": "minecraft:cactus_flower",
+      "required": false
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "values": [
+    "minecraft:raw_copper",
+    "minecraft:copper_ingot",
+    {
+      "id": "minecraft:copper_nugget",
+      "required": false
+    }
+  ]
+}
