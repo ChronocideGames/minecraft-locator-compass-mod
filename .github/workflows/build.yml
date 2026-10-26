@@ -1,14 +1,11 @@
-# Builds the mod on every push and pull request.
-# Pushing a tag like `v1.0.0` also publishes the jar as a GitHub release.
+# Builds the mod and runs the in-game tests on every push and pull request.
+# On main, once both pass, the jar is published as a GitHub release named after the
+# `version` in gradle.properties (only the first time each version appears).
 name: build
 on:
   push:
     branches: [main]
-    tags: ['v*']
   pull_request:
-
-permissions:
-  contents: write
 
 jobs:
   build:
@@ -32,14 +29,6 @@ jobs:
         with:
           name: locator-compass
           path: build/libs/
-      - name: publish release
-        if: startsWith(github.ref, 'refs/tags/v')
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release create "$GITHUB_REF_NAME" build/libs/locator-compass-*.jar \
-            --title "Locator Compass $GITHUB_REF_NAME" \
-            --notes "Fabric mod for Minecraft 26.3. Requires Fabric Loader 0.20.1+ and Fabric API."
 
   # Runs src/gametest in a real headless client: block search, needle angles and bag clicks.
   client-game-test:
@@ -65,3 +54,29 @@ jobs:
         with:
           name: client-game-test-screenshots
           path: build/run/clientGameTest/screenshots
+
+  release:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [build, client-game-test]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v7
+        with:
+          name: locator-compass
+          path: libs
+      - name: publish release if this version is new
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=$(grep '^version=' gradle.properties | cut -d= -f2 | tr -d '[:space:]')
+          if gh release view "v$VERSION" > /dev/null 2>&1; then
+            echo "v$VERSION is already released"
+          else
+            gh release create "v$VERSION" "libs/locator-compass-$VERSION.jar" \
+              --target "$GITHUB_SHA" \
+              --title "Locator Compass $VERSION" \
+              --notes "Fabric mod for Minecraft 26.3. Requires Fabric Loader 0.20.1+ and Fabric API 0.165.0+26.3. Drop the jar into your instance's mods folder."
+          fi
