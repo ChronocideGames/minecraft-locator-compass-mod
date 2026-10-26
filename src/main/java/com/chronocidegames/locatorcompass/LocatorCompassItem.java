@@ -71,9 +71,11 @@ public class LocatorCompassItem extends Item {
 				return false; // Nothing to unload: let vanilla place the compass in the slot.
 			}
 
+			// safeInsert splits from and returns the same stack, so compare against the count from before.
+			int before = stored.getCount();
 			ItemStack rest = slot.safeInsert(stored);
 
-			if (rest.getCount() == stored.getCount()) {
+			if (rest.getCount() == before) {
 				playSound(player, SoundEvents.BUNDLE_INSERT_FAIL);
 			} else {
 				setStored(compass, rest);
