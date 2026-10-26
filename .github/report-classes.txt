@@ -1,1 +1,3 @@
-net.minecraft.util.Prediction
+net.minecraft.world.inventory.AbstractContainerMenu
+net.minecraft.world.inventory.ContainerInput
+net.minecraft.core.TypedInstance

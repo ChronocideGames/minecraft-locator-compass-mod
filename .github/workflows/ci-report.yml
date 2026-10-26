@@ -30,6 +30,15 @@ jobs:
           echo $? > "$R/build-exit-code.txt"
           cp build/libs/*.jar "$R/" 2>/dev/null
 
+          if [ "$(cat "$R/build-exit-code.txt")" = "0" ]; then
+            sudo apt-get install -y -q xvfb > /dev/null 2>&1
+            timeout 25m ./gradlew runClientGameTest --stacktrace --console=plain > "$R/gametest.log" 2>&1
+            echo $? > "$R/gametest-exit-code.txt"
+            mkdir -p "$R/screenshots"
+            find build/run -path '*screenshots*' -name '*.png' -exec cp {} "$R/screenshots/" \;
+            cp build/run/clientGameTest/logs/latest.log "$R/game-latest.log" 2>/dev/null
+          fi
+
           if [ -f .github/report-classes.txt ]; then
             find ~/.gradle .gradle -name '*.jar' 2>/dev/null | grep -iE 'minecraft|fabric-api|fabric-loader' | sort > "$R/jars.txt"
             CP=$(tr '\n' ':' < "$R/jars.txt")

@@ -17,6 +17,17 @@ loom {
 	}
 }
 
+fabricApi {
+	// End-to-end client tests in src/gametest, run with `./gradlew runClientGameTest`.
+	configureTests {
+		createSourceSet = true
+		modId = "locator_compass_test"
+		enableGameTests = false
+		enableClientGameTests = true
+		eula = true
+	}
+}
+
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"

@@ -1,0 +1,15 @@
+{
+	"schemaVersion": 1,
+	"id": "locator_compass_test",
+	"version": "1.0.0",
+	"name": "Locator Compass Tests",
+	"environment": "*",
+	"entrypoints": {
+		"fabric-client-gametest": [
+			"com.chronocidegames.locatorcompass.test.LocatorCompassClientGameTest"
+		]
+	},
+	"depends": {
+		"locator_compass": "*"
+	}
+}
