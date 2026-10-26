@@ -10,6 +10,8 @@ import com.chronocidegames.locatorcompass.client.BlockLocator;
 import com.chronocidegames.locatorcompass.client.LocatorNeedle;
 
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
+import net.minecraft.client.renderer.item.properties.numeric.CompassAngle;
+import net.minecraft.client.renderer.item.properties.numeric.CompassAngleState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -198,21 +200,38 @@ public class LocatorCompassClientGameTest implements FabricClientGameTest {
 	}
 
 	private void takeScreenshots() {
-		BlockPos ore = feet.offset(5, 0, -5); // ahead-left while facing east
+		// Put the ore and the world spawn at the same spot, ahead-left of the player: the vanilla compass in the
+		// off hand and the Locator Compass in the main hand must then agree exactly.
+		BlockPos ore = feet.offset(5, 0, -5);
 		setBlock(ore, "minecraft:iron_ore", Blocks.IRON_ORE);
-
+		singleplayer.getServer().runCommand("setworldspawn %d %d %d".formatted(ore.getX(), ore.getY(), ore.getZ()));
 		giveHeld(Items.RAW_IRON);
-		context.waitTicks(60);
+		context.waitTicks(10);
+
+		float[] angles = context.computeOnClient(client -> new float[] {
+				new LocatorNeedle(false).get(compassHolding(Items.RAW_IRON), client.level, client.player, 0),
+				new CompassAngle(false, CompassAngleState.CompassTarget.SPAWN).get(new ItemStack(Items.COMPASS), client.level, client.player, 0)
+		});
+		check(circularDistance(angles[0], angles[1]) < 0.001F,
+				"needle should match a vanilla compass pointing at the same block: locator " + angles[0] + ", vanilla " + angles[1]);
+
+		context.waitTicks(220); // let chat and toasts fade
 		context.takeScreenshot("locator_compass_pointing_at_ore");
+
+		context.getInput().pressKey(options -> options.keyInventory);
+		context.waitTicks(5);
+		context.getInput().setCursorPos(262, 342); // first hotbar slot in the creative inventory
+		context.waitTicks(2);
+		context.takeScreenshot("inventory_tooltip");
+		context.setScreen(() -> null);
 
 		giveHeld(null);
 		context.waitTicks(20);
 		context.takeScreenshot("locator_compass_empty_spinning");
+	}
 
-		context.getInput().pressKey(options -> options.keyInventory);
-		context.waitTicks(5);
-		context.takeScreenshot("inventory");
-		context.setScreen(() -> null);
+	private static float circularDistance(float a, float b) {
+		return Math.abs(((a - b) % 1.0F + 1.5F) % 1.0F - 0.5F);
 	}
 
 	/// Locator compass (holding `stored`, if any) in the main hand, vanilla compass in the off hand.
@@ -254,8 +273,7 @@ public class LocatorCompassClientGameTest implements FabricClientGameTest {
 
 	private void checkAngle(Item stored, float expected, String what) {
 		float angle = context.computeOnClient(client -> new LocatorNeedle(false).get(compassHolding(stored), client.level, client.player, 0));
-		float error = Math.abs(((angle - expected) % 1.0F + 1.5F) % 1.0F - 0.5F);
-		check(error < 0.03F, what + ": expected " + expected + ", got " + angle);
+		check(circularDistance(angle, expected) < 0.03F, what + ": expected " + expected + ", got " + angle);
 	}
 
 	private static ItemStack stored(ItemStack compass) {
