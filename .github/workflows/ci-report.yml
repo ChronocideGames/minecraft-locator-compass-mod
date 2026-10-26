@@ -1,0 +1,64 @@
+# TEMPORARY: development helper. Builds the mod and pushes the build log, the jar,
+# and API signature dumps to the `ci-report` branch so they can be read without
+# access to the Actions UI. Will be removed once the mod is finished.
+name: ci-report
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  report:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'microsoft'
+      - name: build and collect report
+        shell: bash
+        run: |
+          set +e
+          chmod +x ./gradlew
+          R="$RUNNER_TEMP/report"
+          mkdir -p "$R/api" "$R/assets"
+          ./gradlew build --stacktrace --console=plain > "$R/build.log" 2>&1
+          echo $? > "$R/build-exit-code.txt"
+          cp build/libs/*.jar "$R/" 2>/dev/null
+
+          if [ -f .github/report-classes.txt ]; then
+            find ~/.gradle .gradle -name '*.jar' 2>/dev/null | grep -iE 'minecraft|fabric-api|fabric-loader' | sort > "$R/jars.txt"
+            CP=$(tr '\n' ':' < "$R/jars.txt")
+            while read -r c; do
+              [ -z "$c" ] && continue
+              javap -p -cp "$CP" "$c" > "$R/api/$c.txt" 2>&1
+            done < .github/report-classes.txt
+
+            # Small reference data from the game jars (formats and id lists only).
+            for J in $(grep -iE 'minecraft' "$R/jars.txt"); do
+              unzip -Z1 "$J" 2>/dev/null | grep -E '^(assets|data)/minecraft/' >> "$R/all-resources-raw.txt"
+              for f in assets/minecraft/items/compass.json assets/minecraft/items/recovery_compass.json \
+                       assets/minecraft/items/bundle.json assets/minecraft/models/item/compass_16.json \
+                       assets/minecraft/models/item/compass.json data/minecraft/recipe/compass.json \
+                       data/minecraft/recipe/bundle.json data/minecraft/advancement/recipes/tools/compass.json \
+                       data/minecraft/tags/block/iron_ores.json data/minecraft/tags/block/leaves.json \
+                       data/minecraft/tags/block/logs.json data/minecraft/tags/block/copper_ores.json; do
+                unzip -p "$J" "$f" > "$R/assets/$(echo "$f" | tr '/' '_')" 2>/dev/null || rm -f "$R/assets/$(echo "$f" | tr '/' '_')"
+              done
+            done
+            sort -u "$R/all-resources-raw.txt" > "$R/all-resources.txt"; rm -f "$R/all-resources-raw.txt"
+            grep -E '^assets/minecraft/items/' "$R/all-resources.txt" | sed 's#.*/##; s#\.json$##' > "$R/item-ids.txt"
+            grep -E '^assets/minecraft/blockstates/' "$R/all-resources.txt" | sed 's#.*/##; s#\.json$##' > "$R/block-ids.txt"
+            grep -E '^data/minecraft/tags/(block|item)/' "$R/all-resources.txt" > "$R/tag-files.txt"
+            rm -f "$R/all-resources.txt"
+          fi
+
+          cd "$R"
+          git init -q -b ci-report
+          git add -A
+          git -c user.name=ci -c user.email=ci@localhost commit -qm "report for $GITHUB_SHA"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" ci-report

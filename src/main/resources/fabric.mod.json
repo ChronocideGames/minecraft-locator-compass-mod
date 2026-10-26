@@ -1,0 +1,16 @@
+{
+	"schemaVersion": 1,
+	"id": "locator_compass",
+	"version": "${version}",
+	"name": "Locator Compass",
+	"environment": "*",
+	"entrypoints": {
+		"main": ["com.chronocidegames.locatorcompass.LocatorCompass"]
+	},
+	"depends": {
+		"fabricloader": ">=0.20.1",
+		"minecraft": "~26.3",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}
