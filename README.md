@@ -60,7 +60,7 @@ Shapeless: **Compass + Leather + String**. It's in the Tools & Utilities creativ
 | Honeycomb, honey bottle | Bee nests, beehives |
 | Resin brick | Resin clumps |
 | Chorus fruit, popped chorus fruit | Chorus plants and flowers |
-| Water bucket / Lava bucket | Water / Lava |
+| Water bucket / Lava bucket | Water / Lava source blocks (not flowing) |
 | Wheat, bread | Wheat crops |
 | Sugar, paper | Sugar cane |
 | Melon slice | Melons |

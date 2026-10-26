@@ -22,6 +22,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
@@ -97,7 +98,9 @@ public final class BlockLocator {
 			return null;
 		}
 
-		Predicate<BlockState> matches = state -> targets.contains(state.getBlock());
+		// Fluids only match their source blocks: flowing water is no use for filling a bucket.
+		Predicate<BlockState> matches = state -> targets.contains(state.getBlock())
+				&& (!(state.getBlock() instanceof LiquidBlock) || state.getFluidState().isSource());
 		int centerChunkX = Mth.floor(origin.x()) >> 4;
 		int centerChunkZ = Mth.floor(origin.z()) >> 4;
 		List<Candidate> candidates = new ArrayList<>();

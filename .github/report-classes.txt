@@ -1,3 +1,2 @@
-net.minecraft.world.inventory.AbstractContainerMenu
-net.minecraft.world.inventory.ContainerInput
-net.minecraft.core.TypedInstance
+net.minecraft.world.level.block.LiquidBlock
+net.minecraft.world.level.material.FluidState

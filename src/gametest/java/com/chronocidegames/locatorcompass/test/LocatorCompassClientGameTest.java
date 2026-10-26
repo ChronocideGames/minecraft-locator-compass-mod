@@ -110,7 +110,7 @@ public class LocatorCompassClientGameTest implements FabricClientGameTest {
 		BlockPos leaves = feet.offset(2, 0, 4);
 		BlockPos cobweb = feet.offset(-2, 0, -3);
 		BlockPos wallTorch = feet.offset(0, 1, -4);
-		BlockPos water = feet.offset(-4, 0, 2);
+		BlockPos water = feet.offset(-4, -1, 2); // in a one-block pit so it can't spread
 		setBlock(leaves, "minecraft:oak_leaves[persistent=true]", Blocks.OAK_LEAVES);
 		setBlock(cobweb, "minecraft:cobweb", Blocks.COBWEB);
 		setBlock(wallTorch, "minecraft:wall_torch[facing=north]", Blocks.WALL_TORCH);
@@ -124,9 +124,11 @@ public class LocatorCompassClientGameTest implements FabricClientGameTest {
 		checkFinds(Items.DIRT, feet.offset(0, -2, 0), "a dirt block finds the dirt under the grass");
 		checkFinds(Items.DIAMOND_PICKAXE, null, "a tool finds nothing");
 
-		for (BlockPos pos : new BlockPos[] {leaves, cobweb, wallTorch, water}) {
+		for (BlockPos pos : new BlockPos[] {leaves, cobweb, wallTorch}) {
 			setBlock(pos, "minecraft:air", Blocks.AIR);
 		}
+
+		setBlock(water, "minecraft:grass_block", Blocks.GRASS_BLOCK);
 	}
 
 	private void testBagClicks() {
