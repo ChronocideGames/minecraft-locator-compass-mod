@@ -31,8 +31,10 @@ jobs:
           cp build/libs/*.jar "$R/" 2>/dev/null
 
           if [ "$(cat "$R/build-exit-code.txt")" = "0" ]; then
-            sudo apt-get install -y -q xvfb > /dev/null 2>&1
-            timeout 25m ./gradlew runClientGameTest --stacktrace --console=plain > "$R/gametest.log" 2>&1
+            sudo apt-get update -q > /dev/null 2>&1
+            sudo apt-get install -y -q xvfb libgl1-mesa-dri libglx-mesa0 mesa-vulkan-drivers > "$R/apt.log" 2>&1
+            # Run our own 24-bit Xvfb (xvfb-run's default 8-bit screen has no GLX visual) and stop Loom wrapping it again.
+            env -u CI timeout 15m xvfb-run -a -s "-screen 0 1280x1024x24" ./gradlew runClientGameTest --stacktrace --console=plain > "$R/gametest.log" 2>&1
             echo $? > "$R/gametest-exit-code.txt"
             mkdir -p "$R/screenshots"
             find build/run -path '*screenshots*' -name '*.png' -exec cp {} "$R/screenshots/" \;
